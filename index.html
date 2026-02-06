@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Surprise 🌈🎂</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: linear-gradient(180deg, #0f172a, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      color: #e5e7eb;
+    }
+
+    /* ✨ Falling stars */
+    .star {
+      position: fixed;
+      width: 3px;
+      height: 3px;
+      background: white;
+      opacity: 0.6;
+      animation: fall linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(120vh); }
+    }
+
+    /* Main glass card */
+    .card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 26px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      animation: popIn 0.6s ease;
+      z-index: 2;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    h1 { margin-bottom: 10px; }
+    p { font-size: 1.05rem; opacity: 0.9; }
+
+    .buttons {
+      margin-top: 22px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    .yes { background: #e0e7ff; color: #1e3a8a; font-weight: 600; }
+    .no { background: rgba(255,255,255,0.2); color: #fff; }
+    .restart { background: #000; color: #fff; }
+
+    .countdown { font-size: 3.6rem; font-weight: 700; }
+
+    /* 🎂 Birthday Hero Card */
+    .birthday-hero {
+      background: linear-gradient(135deg, #c7c9f7, #e8c6ff);
+      border-radius: 22px;
+      padding: 36px 30px;
+      color: #000;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.7s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .birthday-hero h1 {
+      font-size: 2.4rem;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    /* 🎈 Balloons */
+    .balloon {
+      position: absolute;
+      width: 46px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, #b7b9ff);
+      opacity: 0.85;
+    }
+
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      width: 2px;
+      height: 18px;
+      background: rgba(255,255,255,0.6);
+    }
+
+    .b1 { top: 14px; right: 30px; }
+    .b2 { bottom: 18px; left: 40px; background: radial-gradient(circle at 30% 30%, #fff, #ffd6e8); }
+    .b3 { top: 60px; left: 18px; background: radial-gradient(circle at 30% 30%, #fff, #caffbf); }
+
+    /* 🌈 Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      top: -10px;
+      animation: confettiSnow 6s ease-in forwards;
+      z-index: 1;
+    }
+
+    @keyframes confettiSnow {
+      to { transform: translateY(110vh) translateX(-40px); opacity: 0; }
+    }
+
+    /* ⌨️ Cursor */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.2em;
+      background: #000;
+      margin-left: 6px;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <div id="screen"></div>
+</div>
+
+<script>
+  const screen = document.getElementById('screen');
+  let noIndex = 0;
+
+  const noMessages = [
+    "Let’s pretend that was an accident.",
+    "Ouch, that hurts… for like 2 seconds.",
+    "You’re really testing this button, huh.",
+    "That decision was made with vibes and THE AUDACITY.",
+    "Bold of you considering no, as if it’s a serious option.",
+    "You’re really seeing how far this goes, aren’t you?",
+    "You keep trying like this is a skill check.",
+    "You’re loyal to that no button. It’s not loyal back.",
+    "You’re rejecting yes as if it offended your ancestors.",
+    "You’re clicking no like you’re being paid per attempt.",
+    "This level of commitment deserves a trophy. Not a win. Just recognition.",
+    "You didn’t come all the way here to make a boring choice.",
+    "You’re clicking no like it’s going to unlock a secret ending.",
+    "This moment only exists for yes.",
+    "Congratulations on your consistency. The no button is just for decoration."
+  ];
+
+  function startScreen() {
+    noIndex = 0;
+    screen.innerHTML = `
+      <h1>🌈 Ready?</h1>
+      <div class="buttons">
+        <button class="yes" onclick="startCountdown()">Begin</button>
+      </div>
+    `;
+  }
+
+  function startCountdown() {
+    let c = 3;
+    screen.innerHTML = `<div class="countdown">${c}</div>`;
+    const t = setInterval(() => {
+      c--;
+      if (c > 0) screen.innerHTML = `<div class="countdown">${c}</div>`;
+      else { clearInterval(t); birthdayScreen(); }
+    }, 900);
+  }
+
+  function birthdayScreen() {
+    screen.innerHTML = `
+      <h1>🎂 Happy Birthday 🎉</h1>
+      <p>Excited for the present?</p>
+      <div class="buttons">
+        <button class="yes" onclick="yesClicked()">Yes</button>
+        <button class="no" onclick="noClicked()">No</button>
+      </div>
+    `;
+  }
+
+  function noClicked() {
+    const msg = noMessages[Math.min(noIndex, noMessages.length - 1)];
+    noIndex++;
+
+    if (noIndex >= noMessages.length) {
+      screen.innerHTML = `
+        <p><strong>${msg}</strong></p>
+        <div class="buttons">
+          <button class="yes" onclick="yesClicked()">Say Yes</button>
+        </div>
+      `;
+    } else {
+      screen.innerHTML = `
+        <p>${msg}</p>
+        <div class="buttons">
+          <button class="yes" onclick="yesClicked()">Say Yes</button>
+          <button class="no" onclick="noClicked()">Still No</button>
+        </div>
+      `;
+    }
+  }
+
+  function yesClicked() {
+    screen.innerHTML = `
+      <div class="birthday-hero">
+        <div class="balloon b1"></div>
+        <div class="balloon b2"></div>
+        <div class="balloon b3"></div>
+
+        <h1>HAPPY BIRTHDAY</h1>
+        <p id="typed"></p>
+
+        <div class="buttons">
+          <button class="restart" onclick="startScreen()">Start Over</button>
+        </div>
+      </div>
+    `;
+
+    typeText(
+      "Wish you happiness, love, and everything beautiful ✨",
+      document.getElementById('typed')
+    );
+
+    launchConfetti();
+  }
+
+  function typeText(text, el) {
+    let i = 0;
+    el.innerHTML = '<span id="txt"></span><span class="cursor"></span>';
+    const span = el.querySelector('#txt');
+
+    const timer = setInterval(() => {
+      span.textContent += text[i];
+      i++;
+      if (i === text.length) clearInterval(timer);
+    }, 80);
+  }
+
+  function launchConfetti() {
+    const colors = ['#ff6b6b','#ffa94d','#ffd43b','#69db7c','#4dabf7','#9775fa','#f783ac'];
+
+    for (let i = 0; i < 140; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[i % colors.length];
+      c.style.animationDuration = 3 + Math.random() * 2 + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
+    }
+  }
+
+  function stars() {
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.top = Math.random() * -120 + 'vh';
+      s.style.animationDuration = 6 + Math.random() * 6 + 's';
+      document.body.appendChild(s);
+    }
+  }
+
+  stars();
+  startScreen();
+</script>
+
+</body>
+</html>
